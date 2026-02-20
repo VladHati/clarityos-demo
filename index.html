@@ -83,7 +83,8 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
   display:flex;align-items:center;gap:6px;
   font-family:var(--font-mono);font-size:10px;color:var(--aurora);
 }
-.header-live-dot{width:5px;height:5px;border-radius:50%;background:var(--aurora);box-shadow:0 0 8px rgba(14,243,197,0.4);}
+.header-live-dot{width:5px;height:5px;border-radius:50%;background:var(--aurora);box-shadow:0 0 8px rgba(14,243,197,0.4);animation:liveBreathe 2s ease-in-out infinite;}
+@keyframes liveBreathe{0%,100%{opacity:1;box-shadow:0 0 8px rgba(14,243,197,0.4)}50%{opacity:0.5;box-shadow:0 0 4px rgba(14,243,197,0.2)}}
 .header-alerts{
   display:flex;align-items:center;gap:6px;
   font-family:var(--font-mono);font-size:10px;color:var(--thermal);
@@ -160,11 +161,11 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
    VIEW TRANSITIONS
    ═══════════════════════════════════════════ */
 .view{
-  display:none;opacity:0;transform:translateY(6px);
-  transition:opacity 0.4s ease, transform 0.4s ease;
+  display:none;opacity:0;transform:translateY(8px);
+  transition:opacity 150ms ease, transform 150ms ease;
 }
 .view.active{display:block;}
-.view.visible{opacity:1;transform:translateY(0);}
+.view.visible{opacity:1;transform:translateY(0);transition:opacity 250ms ease-out, transform 250ms ease-out;}
 
 /* ═══════════════════════════════════════════
    GLASS CARD
@@ -199,7 +200,7 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
   background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);color:var(--text-2);
   cursor:pointer;transition:all 150ms;letter-spacing:0.03em;text-transform:uppercase;
 }
-.source-pill:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);transform:translateY(-1px);}
+.source-pill:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.14);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.2);}
 .source-pill.active{background:rgba(14,243,197,0.05);border-color:rgba(14,243,197,0.2);}
 .source-dot{width:5px;height:5px;border-radius:50%;}
 .source-dot.streaming{background:var(--aurora);box-shadow:0 0 8px rgba(14,243,197,0.4);}
@@ -266,7 +267,7 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
   background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);
   transition:all 200ms cubic-bezier(0.16,1,0.3,1);cursor:pointer;
 }
-.tracker-card:hover{background:rgba(255,255,255,0.04);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.3);}
+.tracker-card:hover{background:rgba(255,255,255,0.04);transform:translateY(-2px);border-color:rgba(255,255,255,0.12);box-shadow:0 8px 32px rgba(0,0,0,0.3);}
 .tracker-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
 .tracker-label{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);}
 .tracker-source-tag{
@@ -281,7 +282,7 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
 .tracker-sparkline{margin:12px 0 10px;height:32px;}
 .tracker-sparkline canvas{display:block;width:100%;height:100%;}
 .tracker-segments{display:flex;gap:3px;margin-bottom:10px;}
-.tracker-seg-bar{height:4px;border-radius:2px;opacity:0.7;transition:flex 0.8s cubic-bezier(0.22,1,0.36,1);flex:0;}
+.tracker-seg-bar{height:4px;border-radius:2px;opacity:0.7;transition:flex 800ms cubic-bezier(0.16,1,0.3,1);flex:0;}
 .tracker-comp{
   display:flex;align-items:center;justify-content:space-between;
   padding-top:10px;border-top:1px solid var(--wire);
@@ -347,7 +348,7 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
   background:rgba(255,255,255,0.02);border:1px solid var(--wire);
   margin-bottom:5px;font-size:12px;transition:all 0.2s;cursor:pointer;
 }
-.mini-watchlist-item:hover{background:rgba(255,255,255,0.04);}
+.mini-watchlist-item:hover{background:rgba(255,255,255,0.04);transform:translateY(-2px);border-color:rgba(255,255,255,0.12);box-shadow:0 8px 32px rgba(0,0,0,0.3);}
 .mini-w-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 .mini-w-dot.high{background:var(--thermal);}
 .mini-w-dot.med{background:var(--amber);}
@@ -469,6 +470,11 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
 }
 .msg{max-width:760px;margin:0 auto 28px;display:flex;gap:10px;animation:msgIn 400ms ease;}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.thinking-dots{display:flex;gap:4px;padding:8px 0;}
+.thinking-dots span{width:6px;height:6px;border-radius:50%;background:var(--violet-g);animation:dotPulse 1.4s ease-in-out infinite;}
+.thinking-dots span:nth-child(2){animation-delay:0.2s;}
+.thinking-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes dotPulse{0%,100%{opacity:0.3;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}
 .msg.user{flex-direction:row-reverse;}
 .msg-avatar{
   width:28px;height:28px;border-radius:9px;
@@ -1284,7 +1290,7 @@ const DATA = {
 /* ═══════════════════════════════════════════
    SPARKLINE UTILITY
    ═══════════════════════════════════════════ */
-function drawSparkline(canvas, data, color, fillAlpha=0.08, w, h) {
+function drawSparkline(canvas, data, color, fillAlpha=0.08, w, h, animate=false, animDuration=1200) {
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const cw = w || canvas.parentElement?.offsetWidth || canvas.width;
@@ -1298,34 +1304,65 @@ function drawSparkline(canvas, data, color, fillAlpha=0.08, w, h) {
   const min = Math.min(...data) - 2;
   const max = Math.max(...data) + 2;
   const step = cw / (data.length - 1);
-
   const getY = v => ch - ((v - min) / (max - min)) * ch;
-
-  // fill
-  ctx.beginPath();
-  ctx.moveTo(0, getY(data[0]));
-  data.forEach((v, i) => ctx.lineTo(i * step, getY(v)));
-  ctx.lineTo(cw, ch);
-  ctx.lineTo(0, ch);
-  ctx.closePath();
   const resolvedColor = getComputedStyle(document.documentElement).getPropertyValue(color.replace('var(','').replace(')','').trim()) || color;
-  ctx.fillStyle = resolvedColor.trim() + (Math.round(fillAlpha * 255)).toString(16).padStart(2,'0');
-  ctx.fill();
+  const rc = resolvedColor.trim();
 
-  // line
-  ctx.beginPath();
-  ctx.moveTo(0, getY(data[0]));
-  data.forEach((v, i) => ctx.lineTo(i * step, getY(v)));
-  ctx.strokeStyle = resolvedColor.trim();
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  function drawFrame(progress) {
+    ctx.clearRect(0, 0, cw, ch);
+    const drawLen = progress * cw;
 
-  // end dot
-  const last = data.length - 1;
-  ctx.beginPath();
-  ctx.arc(last * step, getY(data[last]), 3, 0, Math.PI * 2);
-  ctx.fillStyle = resolvedColor.trim();
-  ctx.fill();
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, drawLen, ch);
+    ctx.clip();
+
+    // fill
+    ctx.beginPath();
+    ctx.moveTo(0, getY(data[0]));
+    data.forEach((v, i) => ctx.lineTo(i * step, getY(v)));
+    ctx.lineTo(cw, ch);
+    ctx.lineTo(0, ch);
+    ctx.closePath();
+    ctx.fillStyle = rc + (Math.round(fillAlpha * 255)).toString(16).padStart(2,'0');
+    ctx.fill();
+
+    // line
+    ctx.beginPath();
+    ctx.moveTo(0, getY(data[0]));
+    data.forEach((v, i) => ctx.lineTo(i * step, getY(v)));
+    ctx.strokeStyle = rc;
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    ctx.restore();
+
+    // end dot when complete
+    if (progress >= 1) {
+      const last = data.length - 1;
+      ctx.beginPath();
+      ctx.arc(last * step, getY(data[last]), 3, 0, Math.PI * 2);
+      ctx.fillStyle = rc;
+      ctx.fill();
+    }
+  }
+
+  if (!animate) {
+    drawFrame(1);
+    return;
+  }
+
+  let start = null;
+  function anim(ts) {
+    if (!start) start = ts;
+    const progress = Math.min((ts - start) / animDuration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    drawFrame(ease);
+    if (progress < 1) requestAnimationFrame(anim);
+  }
+  requestAnimationFrame(anim);
 }
 
 function resolveColor(c) {
@@ -1334,6 +1371,56 @@ function resolveColor(c) {
     return getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
   }
   return c;
+}
+
+/* ═══════════════════════════════════════════
+   COUNT-UP ANIMATION
+   ═══════════════════════════════════════════ */
+function countUp(el, target, duration=1000, prefix='', suffix='') {
+  const isFloat = String(target).includes('.');
+  const hasComma = String(target).includes(',');
+  const numericStr = String(target).replace(/[^0-9.\-]/g, '');
+  const end = parseFloat(numericStr);
+  if (isNaN(end)) { el.textContent = prefix + target + suffix; return; }
+  let start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    const progress = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+    const current = ease * end;
+    let display;
+    if (isFloat) display = current.toFixed(1);
+    else if (hasComma) display = Math.round(current).toLocaleString();
+    else display = Math.round(current).toString();
+    el.textContent = prefix + display + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function animateMonitorNumbers() {
+  // Hero NPS value
+  const heroVal = document.querySelector('.hero-value');
+  if (heroVal) countUp(heroVal, 31, 1000);
+  // Tracker card values
+  document.querySelectorAll('.tracker-card').forEach(card => {
+    const valEl = card.querySelector('.tracker-value');
+    if (!valEl) return;
+    const raw = valEl.textContent.trim();
+    const suffix = raw.includes('%') ? '%' : '';
+    const num = raw.replace('%','');
+    countUp(valEl, num, 1000, '', suffix);
+  });
+}
+
+function animateSocialNumbers() {
+  document.querySelectorAll('#socialStats .stat-val').forEach(el => {
+    const raw = el.textContent.trim();
+    const prefix = raw.startsWith('+') ? '+' : '';
+    const suffix = raw.includes('%') ? '%' : '';
+    const num = raw.replace(/[+%]/g, '');
+    countUp(el, num, 1000, prefix, suffix);
+  });
 }
 
 /* ═══════════════════════════════════════════
@@ -1359,7 +1446,7 @@ function renderHeroSparkline() {
   const step = cw / (data.length - 1);
   const getY = v => ch - ((v - min) / (max - min)) * (ch - 8) - 4;
 
-  const duration = 1500;
+  const duration = 1200;
   let start = null;
   function animate(ts) {
     if (!start) start = ts;
@@ -1444,13 +1531,13 @@ function renderTrackerGrid() {
       <div class="tracker-comp"><span>${t.comp}</span><span class="tracker-comp-val">vs competitor</span></div>
     </div>`;
   }).join('');
-  // draw sparklines
-  setTimeout(() => {
-    DATA.trackers.forEach((t, i) => {
+  // draw sparklines with stagger (150ms between each, starts after hero finishes)
+  DATA.trackers.forEach((t, i) => {
+    setTimeout(() => {
       const c = document.getElementById('trkSpark' + i);
-      if (c) drawSparkline(c, t.sparkData, resolveColor(t.color), 0.08);
-    });
-  }, 50);
+      if (c) drawSparkline(c, t.sparkData, resolveColor(t.color), 0.08, null, null, true, 1200);
+    }, 50 + i * 150);
+  });
 }
 
 // Intelligence Pulse
@@ -1640,52 +1727,9 @@ function animateSegmentBars() {
 }
 
 /* ═══════════════════════════════════════════
-   TYPING ANIMATION (demo AI message)
+   AI THINKING DOTS (for new user messages)
    ═══════════════════════════════════════════ */
-let demoTypingDone = false;
-function runDemoTyping() {
-  if (demoTypingDone) return;
-  demoTypingDone = true;
-  const aiMsg = document.querySelector('#convMessages .msg.ai .msg-bubble');
-  if (!aiMsg) return;
-  const fullHTML = aiMsg.innerHTML;
-  aiMsg.innerHTML = '';
-  aiMsg.style.borderColor = 'rgba(123,47,190,0.25)';
-
-  // We'll reveal by characters but respect HTML tags
-  let i = 0;
-  let visible = '';
-  const totalChars = fullHTML.replace(/<[^>]*>/g, '').length;
-  const msPerChar = 3000 / totalChars; // ~3s total
-  let inTag = false;
-
-  function typeNext() {
-    if (i >= fullHTML.length) {
-      aiMsg.style.borderColor = '';
-      return;
-    }
-    // If we hit a tag opening, fast-forward through the whole tag
-    if (fullHTML[i] === '<') inTag = true;
-    if (inTag) {
-      while (i < fullHTML.length) {
-        visible += fullHTML[i];
-        if (fullHTML[i] === '>') { inTag = false; i++; break; }
-        i++;
-      }
-    } else {
-      visible += fullHTML[i];
-      i++;
-    }
-    aiMsg.innerHTML = visible;
-    // If we just closed a tag, immediately continue to next char
-    if (fullHTML[i] === '<') {
-      typeNext();
-    } else {
-      setTimeout(typeNext, msPerChar);
-    }
-  }
-  typeNext();
-}
+function runDemoTyping() { /* no-op: pre-populated message shows instantly */ }
 
 /* ═══════════════════════════════════════════
    NAVIGATION (crossfade)
@@ -1704,7 +1748,7 @@ function switchView(name) {
   // fade out old
   if (oldView) {
     oldView.classList.remove('visible');
-    setTimeout(() => { oldView.classList.remove('active'); }, 300);
+    setTimeout(() => { oldView.classList.remove('active'); }, 160);
   }
 
   // fade in new
@@ -1723,9 +1767,23 @@ function switchView(name) {
     setTimeout(drawTrackerDetailSparklines, 60);
   }
 
-  // trigger segment bar animation when switching to monitor
+  // trigger monitor animations
   if (name === 'monitor') {
     setTimeout(animateSegmentBars, 100);
+    setTimeout(animateMonitorNumbers, 100);
+    // re-draw tracker sparklines with animation
+    DATA.trackers.forEach((t, i) => {
+      setTimeout(() => {
+        const c = document.getElementById('trkSpark' + i);
+        if (c) drawSparkline(c, t.sparkData, resolveColor(t.color), 0.08, null, null, true, 1200);
+      }, 50 + i * 150);
+    });
+    renderHeroSparkline();
+  }
+
+  // trigger social number count-up
+  if (name === 'social') {
+    setTimeout(animateSocialNumbers, 200);
   }
 
   // trigger typing animation when switching to conversations
@@ -1751,15 +1809,26 @@ document.getElementById('convSendBtn').addEventListener('click', () => {
   userMsg.className = 'msg user';
   userMsg.innerHTML = `<div class="msg-avatar">Y</div><div class="msg-bubble">${input.value}</div>`;
   area.appendChild(userMsg);
+  area.scrollTop = area.scrollHeight;
   const q = input.value;
   input.value = '';
+
+  // Show thinking dots
+  const thinkMsg = document.createElement('div');
+  thinkMsg.className = 'msg ai';
+  thinkMsg.innerHTML = `<div class="msg-avatar">C</div><div class="msg-bubble"><div class="thinking-dots"><span></span><span></span><span></span></div></div>`;
+  area.appendChild(thinkMsg);
+  area.scrollTop = area.scrollHeight;
+
+  // After 1.5s, replace with actual response (fade in)
   setTimeout(() => {
-    const aiMsg = document.createElement('div');
-    aiMsg.className = 'msg ai';
-    aiMsg.innerHTML = `<div class="msg-avatar">C</div><div class="msg-bubble">Analyzing across all 7 data sources for your query: "<strong>${q}</strong>"...<br><br>In the live product, I would synthesize real-time data from Brand24, AppFollow, Event Registry, SerpAPI, your research module, app intelligence, and regulatory filings to provide a grounded, multi-source answer with confidence scoring.<br><br><span class="msg-cite">ClarityOS prototype · demo mode</span></div>`;
-    area.appendChild(aiMsg);
+    const bubble = thinkMsg.querySelector('.msg-bubble');
+    bubble.style.opacity = '0';
+    bubble.style.transition = 'opacity 300ms ease';
+    bubble.innerHTML = `Analyzing across all 7 data sources for your query: "<strong>${q}</strong>"...<br><br>In the live product, I would synthesize real-time data from Brand24, AppFollow, Event Registry, SerpAPI, your research module, app intelligence, and regulatory filings to provide a grounded, multi-source answer with confidence scoring.<br><br><span class="msg-cite">ClarityOS prototype · demo mode</span>`;
+    requestAnimationFrame(() => { bubble.style.opacity = '1'; });
     area.scrollTop = area.scrollHeight;
-  }, 1000);
+  }, 1500);
 });
 document.getElementById('convInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('convSendBtn').click();
@@ -1969,10 +2038,11 @@ renderWatchlist();
 renderChipSets();
 updateClock();
 
-// Kick off initial view transition + segment bar animation
+// Kick off initial view transition + animations
 requestAnimationFrame(() => {
   document.getElementById('view-monitor').classList.add('visible');
   setTimeout(animateSegmentBars, 300);
+  setTimeout(animateMonitorNumbers, 100);
 });
 </script>
 </body>
