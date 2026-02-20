@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClarityOS — Grab Indonesia</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0a0f;--s1:#111118;--s2:#1a1a25;--wire:#2a2a38;
+  --violet:#7B2FBE;--violet-g:#9B4FDE;--aurora:#0EF3C5;--thermal:#FF2D78;
+  --cloud:#F0EDE8;--dim:#C8C4BE;--slate:#6B7280;--lt:#3A3A4D;
+}
+body{background:var(--bg);color:var(--cloud);font-family:'Instrument Sans',sans-serif;display:flex;height:100vh;overflow:hidden;}
+
+/* ── Sidebar ── */
+.sidebar{width:220px;background:var(--s1);border-right:1px solid var(--wire);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--wire);display:flex;align-items:center;gap:10px;}
+.logo-dot{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--violet),var(--violet-g));display:flex;align-items:center;justify-content:center;font-family:'DM Sans';font-weight:500;font-size:14px;color:white;}
+.logo-text{font-family:'DM Sans';font-size:17px;font-weight:500;letter-spacing:-0.03em;}
+.sidebar-client{padding:12px 20px;font-family:'DM Mono';font-size:9px;color:var(--slate);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--wire);}
+.nav{flex:1;padding:12px 8px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:8px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--dim);
+  transition:all 0.2s ease;margin-bottom:2px;
+}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--cloud);}
+.nav-item.active{background:rgba(123,47,190,0.1);color:var(--cloud);border:1px solid rgba(123,47,190,0.15);}
+.nav-item span.icon{width:20px;text-align:center;font-size:15px;}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--wire);font-family:'DM Mono';font-size:8px;color:var(--lt);text-transform:uppercase;letter-spacing:0.06em;}
+
+/* ── Main ── */
+.main{flex:1;overflow-y:auto;padding:24px 32px;}
+.main::-webkit-scrollbar{width:6px;}
+.main::-webkit-scrollbar-thumb{background:var(--wire);border-radius:3px;}
+
+/* ── View containers ── */
+.view{display:none;animation:fadeIn 0.3s ease;}
+.view.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Tracker Cards ── */
+.trackers{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.tracker{
+  padding:20px;border-radius:14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  backdrop-filter:blur(20px);
+  transition:all 0.25s ease;
+}
+.tracker:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);transform:translateY(-2px);}
+.tracker-label{font-family:'DM Mono';font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--slate);margin-bottom:10px;}
+.tracker-val{font-family:'DM Sans';font-size:28px;font-weight:500;letter-spacing:-0.03em;margin-bottom:4px;}
+.tracker-delta{font-family:'DM Mono';font-size:11px;font-weight:500;}
+.tracker-delta.down{color:var(--thermal);}
+.tracker-delta.up{color:var(--aurora);}
+.tracker-bar{height:3px;border-radius:2px;margin-top:12px;background:var(--wire);overflow:hidden;}
+.tracker-bar-fill{height:100%;border-radius:2px;transition:width 1s ease;}
+
+/* ── Section titles ── */
+.sec-title{font-family:'DM Mono';font-size:10px;color:var(--slate);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;margin-top:28px;}
+
+/* ── Chart containers ── */
+.chart-card{
+  padding:24px;border-radius:14px;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+  backdrop-filter:blur(20px);margin-bottom:16px;
+}
+.chart-card-title{font-family:'DM Sans';font-size:14px;font-weight:500;margin-bottom:16px;letter-spacing:-0.02em;}
+.chart-wrap{position:relative;height:220px;}
+
+/* ── Grid layouts ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3-2{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+
+/* ── Pulse items ── */
+.pulse-item{
+  padding:14px 16px;border-radius:10px;
+  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);
+  margin-bottom:8px;display:flex;align-items:center;gap:12px;
+  transition:all 0.2s ease;cursor:pointer;
+}
+.pulse-item:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);}
+.pulse-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.pulse-dot.high{background:var(--thermal);}
+.pulse-dot.med{background:#fbbf24;}
+.pulse-dot.low{background:var(--aurora);}
+.pulse-text{flex:1;font-size:12px;color:var(--dim);line-height:1.5;}
+.pulse-text strong{color:var(--cloud);font-weight:500;}
+.pulse-time{font-family:'DM Mono';font-size:9px;color:var(--lt);white-space:nowrap;}
+
+/* ── Social feed ── */
+.feed-item{
+  padding:14px 16px;border-radius:10px;
+  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);
+  margin-bottom:8px;transition:all 0.2s ease;
+}
+.feed-item:hover{background:rgba(255,255,255,0.04);}
+.feed-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.feed-platform{font-family:'DM Mono';font-size:8px;text-transform:uppercase;letter-spacing:0.06em;padding:2px 6px;border-radius:4px;background:rgba(123,47,190,0.1);color:var(--violet-g);}
+.feed-user{font-family:'DM Mono';font-size:9px;color:var(--slate);}
+.feed-text{font-size:12px;color:var(--dim);line-height:1.6;margin-bottom:8px;}
+.feed-badge{font-family:'DM Mono';font-size:8px;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;display:inline-block;}
+.feed-badge.pos{background:rgba(14,243,197,0.08);color:var(--aurora);border:1px solid rgba(14,243,197,0.15);}
+.feed-badge.neg{background:rgba(255,45,120,0.08);color:var(--thermal);border:1px solid rgba(255,45,120,0.15);}
+.feed-badge.neu{background:rgba(255,255,255,0.04);color:var(--slate);border:1px solid rgba(255,255,255,0.06);}
+
+/* ── Chat ── */
+.chat-container{display:flex;flex-direction:column;height:calc(100vh - 80px);}
+.chat-messages{flex:1;overflow-y:auto;padding:0 0 16px;}
+.chat-msg{max-width:85%;margin-bottom:16px;display:flex;gap:12px;}
+.chat-msg.user{margin-left:auto;flex-direction:row-reverse;}
+.chat-avatar{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0;}
+.chat-msg.ai .chat-avatar{background:linear-gradient(135deg,var(--violet),var(--violet-g));color:white;}
+.chat-msg.user .chat-avatar{background:rgba(255,255,255,0.08);color:var(--dim);}
+.chat-bubble{
+  padding:16px 20px;border-radius:14px;font-size:13px;line-height:1.7;
+}
+.chat-msg.ai .chat-bubble{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:var(--dim);}
+.chat-msg.user .chat-bubble{background:rgba(123,47,190,0.1);border:1px solid rgba(123,47,190,0.15);color:var(--cloud);}
+.chat-bubble strong{color:var(--cloud);font-weight:500;}
+.chat-cite{font-family:'DM Mono';font-size:9px;color:var(--violet-g);background:rgba(123,47,190,0.08);padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px;}
+.chat-input{
+  display:flex;gap:10px;padding:16px 0;border-top:1px solid var(--wire);
+}
+.chat-input input{
+  flex:1;padding:12px 16px;border-radius:10px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--cloud);font-family:'Instrument Sans';font-size:13px;
+  outline:none;transition:border-color 0.2s;
+}
+.chat-input input:focus{border-color:rgba(123,47,190,0.3);}
+.chat-input input::placeholder{color:var(--lt);}
+.chat-input button{
+  padding:12px 20px;border-radius:10px;border:none;
+  background:var(--violet);color:white;font-family:'Instrument Sans';
+  font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;
+}
+.chat-input button:hover{background:var(--violet-g);}
+
+/* ── SoV donut legend ── */
+.sov-legend{margin-top:12px;}
+.sov-item{display:flex;align-items:center;gap:8px;padding:6px 0;}
+.sov-dot{width:10px;height:10px;border-radius:3px;}
+.sov-name{font-size:12px;color:var(--dim);flex:1;}
+.sov-pct{font-family:'DM Mono';font-size:12px;color:var(--cloud);font-weight:500;}
+
+/* ── Placeholder ── */
+.placeholder{
+  display:flex;align-items:center;justify-content:center;
+  height:calc(100vh - 120px);flex-direction:column;gap:12px;
+}
+.placeholder-icon{font-size:48px;opacity:0.3;}
+.placeholder-text{font-family:'DM Mono';font-size:11px;color:var(--lt);text-transform:uppercase;letter-spacing:0.08em;}
+
+/* ── Stats row (social) ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat{padding:16px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);}
+.stat-label{font-family:'DM Mono';font-size:8px;text-transform:uppercase;letter-spacing:0.06em;color:var(--slate);margin-bottom:6px;}
+.stat-val{font-family:'DM Sans';font-size:22px;font-weight:500;letter-spacing:-0.02em;}
+.stat-sub{font-family:'DM Mono';font-size:9px;color:var(--slate);margin-top:2px;}
+
+/* ── News cards ── */
+.news-item{
+  padding:16px;border-radius:10px;
+  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);
+  margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;
+  transition:all 0.2s ease;cursor:pointer;
+}
+.news-item:hover{background:rgba(255,255,255,0.04);}
+.news-type{font-family:'DM Mono';font-size:7px;text-transform:uppercase;letter-spacing:0.06em;padding:3px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;}
+.news-type.reg{background:rgba(255,45,120,0.08);color:var(--thermal);border:1px solid rgba(255,45,120,0.12);}
+.news-type.comp{background:rgba(96,165,250,0.08);color:#60a5fa;border:1px solid rgba(96,165,250,0.12);}
+.news-type.ind{background:rgba(251,191,36,0.08);color:#fbbf24;border:1px solid rgba(251,191,36,0.12);}
+.news-body{flex:1;}
+.news-title{font-size:13px;font-weight:500;color:var(--cloud);margin-bottom:3px;line-height:1.4;}
+.news-meta{font-family:'DM Mono';font-size:8px;color:var(--lt);}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-dot">C</div>
+    <div class="logo-text">ClarityOS</div>
+  </div>
+  <div class="sidebar-client">Grab Indonesia · Live</div>
+  <nav class="nav">
+    <div class="nav-item active" data-view="monitor"><span class="icon">◉</span> Monitor</div>
+    <div class="nav-item" data-view="conversations"><span class="icon">◈</span> Conversations</div>
+    <div class="nav-item" data-view="trackers"><span class="icon">◧</span> Trackers</div>
+    <div class="nav-item" data-view="research"><span class="icon">◬</span> Research</div>
+    <div class="nav-item" data-view="social"><span class="icon">◎</span> Social Listening</div>
+    <div class="nav-item" data-view="news"><span class="icon">▤</span> News & Regulatory</div>
+    <div class="nav-item" data-view="watchlist"><span class="icon">◈</span> Watchlist</div>
+  </nav>
+  <div class="sidebar-footer">ClarityOS v1.0 · Prototype<br>February 2026</div>
+</div>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- ═══ MONITOR VIEW ═══ -->
+  <div class="view active" id="view-monitor">
+    <div class="trackers">
+      <div class="tracker">
+        <div class="tracker-label">Consumer NPS</div>
+        <div class="tracker-val">31</div>
+        <div class="tracker-delta down">↓ 3 pts vs last month</div>
+        <div class="tracker-bar"><div class="tracker-bar-fill" style="width:31%;background:var(--thermal)"></div></div>
+      </div>
+      <div class="tracker">
+        <div class="tracker-label">Brand Equity</div>
+        <div class="tracker-val">54</div>
+        <div class="tracker-delta down">↓ 2.1 vs last month</div>
+        <div class="tracker-bar"><div class="tracker-bar-fill" style="width:54%;background:var(--thermal)"></div></div>
+      </div>
+      <div class="tracker">
+        <div class="tracker-label">Driver Pulse</div>
+        <div class="tracker-val">44%</div>
+        <div class="tracker-delta down">↓ 6 pts vs last month</div>
+        <div class="tracker-bar"><div class="tracker-bar-fill" style="width:44%;background:var(--thermal)"></div></div>
+      </div>
+      <div class="tracker">
+        <div class="tracker-label">Share of Voice</div>
+        <div class="tracker-val">47%</div>
+        <div class="tracker-delta down">↓ 2.1 vs last month</div>
+        <div class="tracker-bar"><div class="tracker-bar-fill" style="width:47%;background:#fbbf24"></div></div>
+      </div>
+      <div class="tracker">
+        <div class="tracker-label">Service Experience</div>
+        <div class="tracker-val">68</div>
+        <div class="tracker-delta up">↑ 1.4 vs last month</div>
+        <div class="tracker-bar"><div class="tracker-bar-fill" style="width:68%;background:var(--aurora)"></div></div>
+      </div>
+    </div>
+
+    <div class="grid-3-2">
+      <div>
+        <div class="chart-card">
+          <div class="chart-card-title">NPS Trend — 12 Months</div>
+          <div class="chart-wrap"><canvas id="npsChart"></canvas></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title">Intelligence Pulse</div>
+        <div class="pulse-item"><div class="pulse-dot high"></div><div class="pulse-text"><strong>Commission cap discussion surging on Twitter</strong> — mentions up 340% in 48h. Linked to OJK regulatory filing.</div><div class="pulse-time">2h ago</div></div>
+        <div class="pulse-item"><div class="pulse-dot med"></div><div class="pulse-text"><strong>Gojek promo pricing detected in Surabaya</strong> — 40% discount on GoCar rides. Driver complaints rising.</div><div class="pulse-time">5h ago</div></div>
+        <div class="pulse-item"><div class="pulse-dot low"></div><div class="pulse-text"><strong>App Store rating improved to 4.3</strong> — latest update resolved payment bug. Positive reviews +28%.</div><div class="pulse-time">8h ago</div></div>
+        <div class="pulse-item"><div class="pulse-dot high"></div><div class="pulse-text"><strong>OJK regulatory filing mentions ride-hailing platforms</strong> — potential commission structure review in Q2.</div><div class="pulse-time">12h ago</div></div>
+        <div class="pulse-item"><div class="pulse-dot med"></div><div class="pulse-text"><strong>ShopeeFood expanding dark kitchen network in Jakarta</strong> — 15 new locations detected via app data.</div><div class="pulse-time">1d ago</div></div>
+      </div>
+    </div>
+
+    <div class="sec-title">Live Social Feed</div>
+    <div class="feed-item"><div class="feed-head"><span class="feed-platform">Twitter</span><span class="feed-user">@raniwijaya · 14m</span></div><div class="feed-text">GrabFood delivery sudah 2 jam belum sampai. Customer service ga bisa dihubungi. Kapok pake Grab 😤</div><span class="feed-badge neg">Negative · 0.89</span></div>
+    <div class="feed-item"><div class="feed-head"><span class="feed-platform">TikTok</span><span class="feed-user">@jakartafoodie · 1h</span></div><div class="feed-text">Nemu promo GrabFood diskon 60% buat makanan Korea! Worth it banget sih, ayam gorengnya enak parah 🤤</div><span class="feed-badge pos">Positive · 0.94</span></div>
+    <div class="feed-item"><div class="feed-head"><span class="feed-platform">Kaskus</span><span class="feed-user">agan_driver_jaksel · 2h</span></div><div class="feed-text">Udah sebulan nih komisi dipotong makin gede. Kalau begini terus mending pindah ke Maxim aja. Ada yang udah coba?</div><span class="feed-badge neg">Negative · 0.91</span></div>
+    <div class="feed-item"><div class="feed-head"><span class="feed-platform">Instagram</span><span class="feed-user">@grabid · 3h</span></div><div class="feed-text">GrabCar baru aja launch fitur "Jemput di Titik" yang lebih akurat. Lumayan sih ga perlu lama nunggu lagi.</div><span class="feed-badge pos">Positive · 0.76</span></div>
+    <div class="feed-item"><div class="feed-head"><span class="feed-platform">Twitter</span><span class="feed-user">@belomdihire · 4h</span></div><div class="feed-text">Beda tipis sih harga Grab sama Gojek sekarang. Lebih ke siapa yang promonya lebih gede aja.</div><span class="feed-badge neu">Neutral · 0.52</span></div>
+  </div>
+
+  <!-- ═══ CONVERSATIONS VIEW ═══ -->
+  <div class="view" id="view-conversations">
+    <div class="chat-container">
+      <div class="chat-messages">
+        <div class="chat-msg user">
+          <div class="chat-avatar">Y</div>
+          <div class="chat-bubble">Why did NPS drop last week? What's driving it?</div>
+        </div>
+        <div class="chat-msg ai">
+          <div class="chat-avatar">C</div>
+          <div class="chat-bubble">
+            NPS dropped <strong>3 points to 31</strong> over the past 7 days. I've traced this to three converging signals:
+            <br><br>
+            <strong>1. Commission cap backlash (primary driver)</strong><br>
+            Social media mentions of "commission" and "potongan" spiked 340% on Twitter and Kaskus. Driver dissatisfaction is bleeding into consumer perception — riders are reporting longer wait times and drivers refusing short trips.
+            <br><br>
+            <strong>2. App store review deterioration</strong><br>
+            Google Play rating dropped from 4.4 to 4.1 over the past 10 days. The top complaint cluster is "payment failed" (38% of 1-star reviews), followed by "driver cancelled" (24%). The payment bug was patched 2 days ago but review recovery typically lags by 5-7 days.
+            <br><br>
+            <strong>3. Gojek promo offensive in Surabaya</strong><br>
+            Gojek launched aggressive 40% GoCar discounts in Surabaya and Bandung. Our Share of Voice in those cities dropped from 51% to 39% in one week. Survey data from the Jan research wave shows price sensitivity is the #1 switching driver for the 18-24 segment.
+            <br><br>
+            <span class="chat-cite">Sources: Brand24 social feed · AppFollow reviews · SerpAPI trends · Jan 2026 quant wave (n=1,200)</span>
+            <br>
+            <span class="chat-cite">Confidence: 0.87 — high convergence across sources</span>
+          </div>
+        </div>
+        <div class="chat-msg user">
+          <div class="chat-avatar">Y</div>
+          <div class="chat-bubble">What should we do about the Gojek promos in Surabaya?</div>
+        </div>
+        <div class="chat-msg ai">
+          <div class="chat-avatar">C</div>
+          <div class="chat-bubble">
+            Based on historical patterns and current data, I'd highlight three options with different tradeoffs:
+            <br><br>
+            <strong>Option A: Match the promo (defensive)</strong><br>
+            Historical data shows Gojek promo cycles last 2-3 weeks in tier-2 cities. Matching now protects short-term SoV but compresses margins. The Jan survey shows 62% of promo-acquired users churn within 30 days of promo end.
+            <br><br>
+            <strong>Option B: Counter with service quality (asymmetric)</strong><br>
+            Our Service Experience score (68, up 1.4) is our strongest tracker. The "Jemput di Titik" feature launch saw positive sentiment of 0.76. Doubling down on reliability messaging in Surabaya could differentiate without margin compression.
+            <br><br>
+            <strong>Option C: Target the driver side (structural)</strong><br>
+            Driver Pulse at 44% is the weakest tracker. Gojek's promos require drivers. If we improve driver incentives in Surabaya specifically, we can constrain their supply while improving our service quality. The Kaskus driver forums show Maxim is already pulling drivers — a targeted incentive could prevent further attrition.
+            <br><br>
+            I'd recommend commissioning a quick-turn quant study (n=400, Surabaya only) to test messaging options before committing budget. Shall I draft the research brief?
+            <br><br>
+            <span class="chat-cite">Sources: Jan 2026 quant wave · Driver panel Feb W2 · Brand24 · Kaskus driver forums</span>
+            <br>
+            <span class="chat-cite">Confidence: 0.72 — strategic recommendation, verify with research</span>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input">
+        <input type="text" placeholder="Ask ClarityOS anything about Grab Indonesia...">
+        <button>Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SOCIAL VIEW ═══ -->
+  <div class="view" id="view-social">
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Share of Voice</div><div class="stat-val">47%</div><div class="stat-sub">↓ 2.1 vs last month</div></div>
+      <div class="stat"><div class="stat-label">Net Sentiment</div><div class="stat-val">+61%</div><div class="stat-sub">↓ 4 pts vs last week</div></div>
+      <div class="stat"><div class="stat-label">Mentions / 24h</div><div class="stat-val">4,230</div><div class="stat-sub">↑ 12% vs avg</div></div>
+      <div class="stat"><div class="stat-label">Platforms tracked</div><div class="stat-val">8</div><div class="stat-sub">Twitter, TikTok, IG, YT, Kaskus, FB, Reddit, forums</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="chart-card">
+        <div class="chart-card-title">Share of Voice — Brand Mentions</div>
+        <div class="chart-wrap"><canvas id="sovChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Sentiment by Platform</div>
+        <div class="chart-wrap"><canvas id="sentChart"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Mention Volume — 30 Days</div>
+      <div class="chart-wrap"><canvas id="volChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ═══ TRACKERS VIEW ═══ -->
+  <div class="view" id="view-trackers">
+    <div class="trackers" style="grid-template-columns:repeat(5,1fr);margin-bottom:24px;">
+      <div class="tracker"><div class="tracker-label">Consumer NPS</div><div class="tracker-val">31</div><div class="tracker-delta down">↓ 3 pts</div></div>
+      <div class="tracker"><div class="tracker-label">Brand Equity</div><div class="tracker-val">54</div><div class="tracker-delta down">↓ 2.1</div></div>
+      <div class="tracker"><div class="tracker-label">Driver Pulse</div><div class="tracker-val">44%</div><div class="tracker-delta down">↓ 6 pts</div></div>
+      <div class="tracker"><div class="tracker-label">Share of Voice</div><div class="tracker-val">47%</div><div class="tracker-delta down">↓ 2.1</div></div>
+      <div class="tracker"><div class="tracker-label">Service Exp</div><div class="tracker-val">68</div><div class="tracker-delta up">↑ 1.4</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="chart-card">
+        <div class="chart-card-title">All Trackers — 12 Month Trend</div>
+        <div class="chart-wrap"><canvas id="allTrackersChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Tracker Sources Breakdown</div>
+        <div class="chart-wrap"><canvas id="sourcesChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ NEWS VIEW ═══ -->
+  <div class="view" id="view-news">
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Articles / 24h</div><div class="stat-val">47</div><div class="stat-sub">across 34 outlets</div></div>
+      <div class="stat"><div class="stat-label">Regulatory filings</div><div class="stat-val">3</div><div class="stat-sub">OJK, BI, KPPU</div></div>
+      <div class="stat"><div class="stat-label">High impact</div><div class="stat-val">5</div><div class="stat-sub">requires attention</div></div>
+      <div class="stat"><div class="stat-label">Competitor mentions</div><div class="stat-val">18</div><div class="stat-sub">Gojek 11, ShopeeFood 7</div></div>
+    </div>
+    <div class="sec-title">Latest articles — sorted by impact</div>
+    <div class="news-item"><div class="news-type reg">Regulatory</div><div class="news-body"><div class="news-title">OJK proposes new commission structure framework for ride-hailing platforms</div><div class="news-meta">Bisnis Indonesia · 3 hours ago · Impact: High</div></div></div>
+    <div class="news-item"><div class="news-type comp">Competitive</div><div class="news-body"><div class="news-title">Gojek partners with Tokopedia for integrated logistics in 5 new cities</div><div class="news-meta">Kompas · 6 hours ago · Impact: High</div></div></div>
+    <div class="news-item"><div class="news-type reg">Regulatory</div><div class="news-body"><div class="news-title">Ministry of Transport updates minimum fare calculation for online transportation</div><div class="news-meta">Tempo · 8 hours ago · Impact: Medium</div></div></div>
+    <div class="news-item"><div class="news-type ind">Industry</div><div class="news-body"><div class="news-title">Indonesian ride-hailing market projected to reach $8.2B by 2027</div><div class="news-meta">Jakarta Post · 12 hours ago · Impact: Low</div></div></div>
+    <div class="news-item"><div class="news-type comp">Competitive</div><div class="news-body"><div class="news-title">ShopeeFood expands dark kitchen network with 15 new locations in Jabodetabek</div><div class="news-meta">CNN Indonesia · 1 day ago · Impact: Medium</div></div></div>
+    <div class="news-item"><div class="news-type ind">Industry</div><div class="news-body"><div class="news-title">Gen Z spending on food delivery up 34% YoY in Southeast Asia</div><div class="news-meta">Nikkei Asia · 1 day ago · Impact: Medium</div></div></div>
+  </div>
+
+  <!-- ═══ RESEARCH VIEW ═══ -->
+  <div class="view" id="view-research">
+    <div class="placeholder"><div class="placeholder-icon">◬</div><div class="placeholder-text">Research hub — coming in v1.1</div><div style="font-size:12px;color:var(--slate);margin-top:8px;">Launch quant and qual studies, view past research, auto-generate topline reports</div></div>
+  </div>
+
+  <!-- ═══ WATCHLIST VIEW ═══ -->
+  <div class="view" id="view-watchlist">
+    <div class="sec-title">Active watchlist items</div>
+    <div class="pulse-item"><div class="pulse-dot high"></div><div class="pulse-text"><strong>Commission Cap Regulation</strong> — monitoring OJK, BI, KPPU for any regulatory filings mentioning commission structures</div><div class="pulse-time">3 triggers / 7d</div></div>
+    <div class="pulse-item"><div class="pulse-dot high"></div><div class="pulse-text"><strong>Driver Attrition Signal</strong> — alert when Driver Pulse drops below 40% or Kaskus/forum mentions of "pindah" spike above 200%</div><div class="pulse-time">1 trigger / 7d</div></div>
+    <div class="pulse-item"><div class="pulse-dot med"></div><div class="pulse-text"><strong>Gojek Pricing Offensive</strong> — tracking promo pricing changes in top 8 cities via app monitoring and social signals</div><div class="pulse-time">5 triggers / 7d</div></div>
+    <div class="pulse-item"><div class="pulse-dot med"></div><div class="pulse-text"><strong>ShopeeFood Expansion</strong> — monitoring dark kitchen openings, merchant recruitment ads, and app feature launches</div><div class="pulse-time">2 triggers / 7d</div></div>
+    <div class="pulse-item"><div class="pulse-dot low"></div><div class="pulse-text"><strong>Gen Z Sentiment Shift</strong> — tracking 18-24 demographic sentiment across TikTok and Instagram specifically</div><div class="pulse-time">0 triggers / 7d</div></div>
+    <div class="pulse-item"><div class="pulse-dot low"></div><div class="pulse-text"><strong>Maxim Market Entry</strong> — new competitor monitoring across all data sources in tier-2 and tier-3 cities</div><div class="pulse-time">1 trigger / 7d</div></div>
+  </div>
+
+</div>
+
+<script>
+// ── Navigation ──
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('view-' + item.dataset.view).classList.add('active');
+    // Init charts when view becomes visible
+    if (item.dataset.view === 'social') initSocialCharts();
+    if (item.dataset.view === 'trackers') initTrackerCharts();
+  });
+});
+
+// ── Chart defaults ──
+Chart.defaults.color = '#6B7280';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.04)';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 10;
+
+// ── NPS Chart (Monitor) ──
+new Chart(document.getElementById('npsChart'), {
+  type: 'line',
+  data: {
+    labels: ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'],
+    datasets: [{
+      label: 'NPS',
+      data: [38,36,35,37,34,33,36,35,33,34,34,31],
+      borderColor: '#FF2D78',
+      backgroundColor: 'rgba(255,45,120,0.05)',
+      fill: true,
+      tension: 0.4,
+      borderWidth: 2,
+      pointRadius: 3,
+      pointBackgroundColor: '#FF2D78',
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { min: 25, max: 45, grid: { color: 'rgba(255,255,255,0.03)' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── Social Charts ──
+let socialInited = false;
+function initSocialCharts() {
+  if (socialInited) return;
+  socialInited = true;
+
+  new Chart(document.getElementById('sovChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Grab','Gojek','ShopeeFood','Others'],
+      datasets: [{
+        data: [47,36,12,5],
+        backgroundColor: ['#7B2FBE','#0EF3C5','#fbbf24','#3A3A4D'],
+        borderWidth: 0,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyle: 'rectRounded' } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('sentChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Twitter','TikTok','Instagram','Kaskus','YouTube','Facebook'],
+      datasets: [
+        { label: 'Positive', data: [42,58,51,28,45,38], backgroundColor: '#0EF3C5', borderRadius: 4 },
+        { label: 'Neutral', data: [31,25,33,22,35,40], backgroundColor: '#3A3A4D', borderRadius: 4 },
+        { label: 'Negative', data: [27,17,16,50,20,22], backgroundColor: '#FF2D78', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'rectRounded' } } },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: { stacked: true, max: 100, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { callback: v => v + '%' } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('volChart'), {
+    type: 'line',
+    data: {
+      labels: Array.from({length:30},(_,i)=>'Jan '+(i+1)),
+      datasets: [
+        { label:'Grab', data:[3200,3400,3100,3500,3800,4200,4100,3900,3600,3400,3700,4000,4300,4500,4100,3800,3600,3900,4200,4800,5200,5400,4900,4500,4300,4600,4400,4200,4100,4230], borderColor:'#7B2FBE', borderWidth:2, tension:0.3, pointRadius:0 },
+        { label:'Gojek', data:[2800,2900,2700,2800,3100,3000,2900,2800,2700,2900,3000,3200,3100,3000,2900,2800,3000,3100,3300,3500,3400,3200,3100,3000,2900,3100,3000,2900,2800,2900], borderColor:'#0EF3C5', borderWidth:2, tension:0.3, pointRadius:0 },
+        { label:'ShopeeFood', data:[800,850,900,820,880,950,1000,980,920,880,900,950,1020,1050,980,920,950,1000,1050,1100,1150,1100,1050,1000,980,1020,1050,1080,1100,1050], borderColor:'#fbbf24', borderWidth:2, tension:0.3, pointRadius:0 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'rectRounded' } } },
+      scales: {
+        y: { grid: { color: 'rgba(255,255,255,0.03)' } },
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }
+      }
+    }
+  });
+}
+
+// ── Tracker Charts ──
+let trackerInited = false;
+function initTrackerCharts() {
+  if (trackerInited) return;
+  trackerInited = true;
+
+  new Chart(document.getElementById('allTrackersChart'), {
+    type: 'line',
+    data: {
+      labels: ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'],
+      datasets: [
+        { label:'NPS', data:[38,36,35,37,34,33,36,35,33,34,34,31], borderColor:'#FF2D78', borderWidth:2, tension:0.3, pointRadius:2 },
+        { label:'Brand Equity', data:[60,59,58,57,58,57,56,57,56,55,55,54], borderColor:'#7B2FBE', borderWidth:2, tension:0.3, pointRadius:2 },
+        { label:'Driver Pulse', data:[62,60,58,55,53,52,50,48,50,48,47,44], borderColor:'#fbbf24', borderWidth:2, tension:0.3, pointRadius:2 },
+        { label:'SoV', data:[52,51,50,51,50,49,50,49,48,49,48,47], borderColor:'#60a5fa', borderWidth:2, tension:0.3, pointRadius:2 },
+        { label:'Service Exp', data:[61,62,63,62,64,65,64,66,65,67,67,68], borderColor:'#0EF3C5', borderWidth:2, tension:0.3, pointRadius:2 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'rectRounded' } } },
+      scales: {
+        y: { min: 20, max: 80, grid: { color: 'rgba(255,255,255,0.03)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('sourcesChart'), {
+    type: 'bar',
+    data: {
+      labels: ['NPS','Brand Equity','Driver Pulse','SoV','Service Exp'],
+      datasets: [
+        { label:'Social', data: [30,40,15,60,25], backgroundColor:'#7B2FBE', borderRadius:4 },
+        { label:'Reviews', data: [25,15,5,10,40], backgroundColor:'#9B4FDE', borderRadius:4 },
+        { label:'News', data: [5,10,10,20,5], backgroundColor:'#60a5fa', borderRadius:4 },
+        { label:'Research', data: [35,25,60,5,20], backgroundColor:'#0EF3C5', borderRadius:4 },
+        { label:'Trends', data: [5,10,10,5,10], backgroundColor:'#fbbf24', borderRadius:4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'rectRounded' } } },
+      scales: {
+        x: { stacked: true, max: 100, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { callback: v=>v+'%' } },
+        y: { stacked: true, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ── Chat send (fake) ──
+document.querySelector('.chat-input button').addEventListener('click', () => {
+  const input = document.querySelector('.chat-input input');
+  if (!input.value.trim()) return;
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg user';
+  msg.innerHTML = `<div class="chat-avatar">Y</div><div class="chat-bubble">${input.value}</div>`;
+  document.querySelector('.chat-messages').appendChild(msg);
+  input.value = '';
+  // Fake AI response
+  setTimeout(() => {
+    const ai = document.createElement('div');
+    ai.className = 'chat-msg ai';
+    ai.innerHTML = `<div class="chat-avatar">C</div><div class="chat-bubble">Analyzing across all data sources... This is a prototype — in the live product, I would synthesize an answer from Brand24 social data, AppFollow reviews, Event Registry news, SerpAPI trends, and your research module to give you a grounded, cited response.<br><br><span class="chat-cite">ClarityOS prototype · live data not connected</span></div>`;
+    document.querySelector('.chat-messages').appendChild(ai);
+    ai.scrollIntoView({ behavior: 'smooth' });
+  }, 1200);
+});
+document.querySelector('.chat-input input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.querySelector('.chat-input button').click();
+});
+</script>
+</body>
+</html>
