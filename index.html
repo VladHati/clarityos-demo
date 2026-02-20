@@ -409,7 +409,6 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
 }
 .convo-send:hover{background:var(--violet);border-color:var(--violet);color:white;box-shadow:0 0 16px rgba(123,47,190,0.3);}
 .convo-send svg{width:16px;height:16px;}
-.convo-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .convo-chip{
   font-family:var(--font-mono);font-size:10px;color:var(--text-3);
   padding:6px 14px;border-radius:999px;
@@ -689,6 +688,93 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
 .wl-stat-label{font-family:var(--font-mono);font-size:7px;color:var(--text-4);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;}
 .wl-stat-val{font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text-1);}
 .wl-stat-delta{font-family:var(--font-mono);font-size:8px;margin-top:2px;}
+
+/* ═══════════════════════════════════════════
+   COMMAND PALETTE
+   ═══════════════════════════════════════════ */
+.cmd-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding-top:18vh;
+  opacity:0;pointer-events:none;transition:opacity 200ms ease;
+}
+.cmd-overlay.open{opacity:1;pointer-events:auto;}
+.cmd-box{
+  width:520px;max-height:420px;border-radius:16px;
+  background:rgba(26,26,37,0.95);backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 24px 80px rgba(0,0,0,0.5);
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:scale(0.96) translateY(-8px);transition:transform 200ms cubic-bezier(0.16,1,0.3,1);
+}
+.cmd-overlay.open .cmd-box{transform:scale(1) translateY(0);}
+.cmd-input-wrap{
+  display:flex;align-items:center;gap:10px;padding:16px 20px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.cmd-input-wrap svg{width:16px;height:16px;color:var(--text-3);flex-shrink:0;}
+.cmd-input{
+  flex:1;background:none;border:none;outline:none;
+  font-family:var(--font-body);font-size:15px;color:var(--text-1);
+}
+.cmd-input::placeholder{color:var(--text-4);}
+.cmd-esc{
+  font-family:var(--font-mono);font-size:9px;color:var(--text-5);
+  padding:2px 6px;border-radius:4px;border:1px solid rgba(255,255,255,0.06);
+}
+.cmd-results{flex:1;overflow-y:auto;padding:8px;}
+.cmd-results::-webkit-scrollbar{width:4px;}
+.cmd-results::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px;}
+.cmd-result{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:8px;cursor:pointer;
+  transition:background 80ms;
+}
+.cmd-result:hover,.cmd-result.active,.cmd-result.selected{background:rgba(255,255,255,0.06);}
+.cmd-result-icon{
+  width:24px;height:24px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;flex-shrink:0;
+}
+.cmd-result-icon.nav{background:var(--aurora-dim);color:var(--aurora);}
+.cmd-result-icon.tracker{background:var(--violet-dim);color:var(--violet-g);}
+.cmd-result-icon.pulse{background:var(--thermal-dim);color:var(--thermal);}
+.cmd-result-icon.watchlist{background:var(--amber-dim);color:var(--amber);}
+.cmd-result-text{flex:1;min-width:0;}
+.cmd-result-label{font-size:13px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmd-result-type{font-family:var(--font-mono);font-size:9px;color:var(--text-4);text-transform:uppercase;letter-spacing:0.04em;margin-top:1px;}
+.cmd-result-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-4);text-transform:uppercase;letter-spacing:0.04em;}
+.cmd-empty{padding:24px;text-align:center;font-size:12px;color:var(--text-4);}
+
+/* ═══════════════════════════════════════════
+   TRACKER TOOLTIP
+   ═══════════════════════════════════════════ */
+.trk-tip{
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  padding:10px 14px;border-radius:10px;
+  background:rgba(26,26,37,0.95);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  white-space:nowrap;pointer-events:none;
+  opacity:0;transition:opacity 150ms;z-index:100;
+}
+.tracker-card:hover .trk-tip{opacity:1;}
+.trk-tip-title{font-family:var(--font-mono);font-size:8px;color:var(--text-4);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;}
+.trk-tip-row{display:flex;gap:12px;margin-bottom:3px;}
+.trk-tip-pt{font-family:var(--font-mono);font-size:10px;color:var(--text-2);}
+.trk-tip-src{font-family:var(--font-mono);font-size:8px;color:var(--text-4);margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.06);}
+
+/* ═══════════════════════════════════════════
+   CHIP ROTATION
+   ═══════════════════════════════════════════ */
+.convo-chips{position:relative;min-height:28px;}
+.chip-set{
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  transition:opacity 0.5s ease;position:absolute;width:100%;
+}
+.chip-set.hidden{opacity:0;pointer-events:none;}
+.chip-set.visible{opacity:1;pointer-events:auto;}
 </style>
 </head>
 <body>
@@ -1018,11 +1104,18 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
-  <div class="convo-chips">
-    <div class="convo-chip">Why did NPS drop?</div>
-    <div class="convo-chip">Summarize today's alerts</div>
-    <div class="convo-chip">Compare Grab vs Gojek sentiment</div>
-    <div class="convo-chip">Draft research brief</div>
+  <div class="convo-chips" id="chipContainer"></div>
+</div>
+
+<!-- COMMAND PALETTE -->
+<div class="cmd-overlay" id="cmdOverlay">
+  <div class="cmd-box">
+    <div class="cmd-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="cmd-input" id="cmdInput" placeholder="Search trackers, views, alerts...">
+      <span class="cmd-esc">ESC</span>
+    </div>
+    <div class="cmd-results" id="cmdResults"></div>
   </div>
 </div>
 
@@ -1323,10 +1416,19 @@ function renderHeroSparkline() {
 }
 
 // Tracker grid (Monitor)
+const MONTHS = ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
 function renderTrackerGrid() {
   const el = document.getElementById('trackerGrid');
-  el.innerHTML = DATA.trackers.map((t, i) => `
-    <div class="tracker-card" onclick="switchView('conversations')">
+  el.innerHTML = DATA.trackers.map((t, i) => {
+    const d = t.sparkData;
+    const last3 = d.slice(-3).map((v,j) => `<span class="trk-tip-pt">${MONTHS[d.length-3+j]}: <strong style="color:var(--text-1)">${v}${t.value.includes('%')?'%':''}</strong></span>`).join('');
+    return `
+    <div class="tracker-card" style="position:relative" onclick="switchView('conversations')">
+      <div class="trk-tip">
+        <div class="trk-tip-title">Last 3 months</div>
+        <div class="trk-tip-row">${last3}</div>
+        <div class="trk-tip-src">Source: ${t.source}</div>
+      </div>
       <div class="tracker-header">
         <div class="tracker-label">${t.label}</div>
         <div class="tracker-source-tag">${t.source}</div>
@@ -1336,8 +1438,8 @@ function renderTrackerGrid() {
       <div class="tracker-sparkline"><canvas id="trkSpark${i}"></canvas></div>
       <div class="tracker-segments" data-card-idx="${i}">${t.segments.map(s => `<div class="tracker-seg-bar" data-flex="${s.w}" style="background:${s.c};flex:0"></div>`).join('')}</div>
       <div class="tracker-comp"><span>${t.comp}</span><span class="tracker-comp-val">vs competitor</span></div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
   // draw sparklines
   setTimeout(() => {
     DATA.trackers.forEach((t, i) => {
@@ -1672,19 +1774,164 @@ document.getElementById('globalInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('globalSend').click();
 });
 
-/* Suggestion chips */
-document.querySelectorAll('.convo-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.getElementById('globalInput').value = chip.textContent;
-    document.getElementById('globalSend').click();
+/* ═══════════════════════════════════════════
+   ROTATING SUGGESTION CHIPS
+   ═══════════════════════════════════════════ */
+const CHIP_POOL = [
+  'How is brand equity trending this month?',
+  'Summarize the top driver complaints',
+  'Compare our NPS with Gojek',
+  'What are the latest regulatory risks?',
+  'Show me the commission cap discussion',
+  'How is Gen Z sentiment changing?',
+  'What\'s ShopeeFood doing in Jabodetabek?',
+  'Analyze the latest app store reviews',
+  'Which cities have active Gojek promos?',
+  'What are the top trending topics today?',
+  'Give me a competitive landscape overview',
+  'Summarize this week\'s social listening'
+];
+let chipSetIndex = 0;
+function renderChipSets() {
+  const container = document.getElementById('chipContainer');
+  container.innerHTML = '';
+  const sets = [];
+  for (let s = 0; s < 3; s++) {
+    const setDiv = document.createElement('div');
+    setDiv.className = 'chip-set' + (s === 0 ? ' visible' : ' hidden');
+    for (let i = 0; i < 4; i++) {
+      const chip = document.createElement('div');
+      chip.className = 'convo-chip';
+      chip.textContent = CHIP_POOL[s * 4 + i];
+      setDiv.appendChild(chip);
+    }
+    container.appendChild(setDiv);
+    sets.push(setDiv);
+  }
+  chipSetIndex = 0;
+  setInterval(() => {
+    const allSets = container.querySelectorAll('.chip-set');
+    allSets[chipSetIndex].classList.remove('visible');
+    allSets[chipSetIndex].classList.add('hidden');
+    chipSetIndex = (chipSetIndex + 1) % allSets.length;
+    allSets[chipSetIndex].classList.remove('hidden');
+    allSets[chipSetIndex].classList.add('visible');
+  }, 8000);
+}
+/* Delegated chip clicks */
+document.getElementById('chipContainer').addEventListener('click', e => {
+  const chip = e.target.closest('.convo-chip');
+  if (!chip) return;
+  document.getElementById('globalInput').value = chip.textContent;
+  document.getElementById('globalSend').click();
+});
+
+/* ═══════════════════════════════════════════
+   COMMAND PALETTE (⌘K)
+   ═══════════════════════════════════════════ */
+const cmdOverlay = document.getElementById('cmdOverlay');
+const cmdInput = document.getElementById('cmdInput');
+const cmdResults = document.getElementById('cmdResults');
+
+function buildSearchIndex() {
+  const items = [];
+  /* Navigation views */
+  const views = [
+    { label:'Monitor — Dashboard Overview', view:'monitor', icon:'📊' },
+    { label:'Conversations — AI Chat', view:'conversations', icon:'💬' },
+    { label:'Social Listening — Mentions & Sentiment', view:'social', icon:'📡' },
+    { label:'News & Regulatory', view:'news', icon:'📰' },
+    { label:'Trackers — Composite Metrics Detail', view:'trackers', icon:'📈' },
+    { label:'Research — Studies & Surveys', view:'research', icon:'🔬' },
+    { label:'Watchlist — Alerts & Triggers', view:'watchlist', icon:'🔔' },
+  ];
+  views.forEach(v => items.push({ type:'View', label:v.label, icon:v.icon, action:() => { closePalette(); switchView(v.view); } }));
+  /* Trackers (from detail view — includes all 5 composite metrics) */
+  DATA.trackersDetail.forEach(t => items.push({ type:'Tracker', label:t.label + ' — ' + t.value + (t.value.includes('%')?'':' pts'), icon:'📈', action:() => { closePalette(); switchView('trackers'); } }));
+  /* Watchlist items */
+  DATA.watchlistItems.forEach(w => items.push({ type:'Watchlist', label:w.title, icon:'🔔', action:() => { closePalette(); switchView('watchlist'); } }));
+  /* Pulse items */
+  DATA.pulse.forEach(p => {
+    const plainText = p.text.replace(/<[^>]*>/g, '');
+    items.push({ type:'Alert', label:plainText.substring(0, 80) + '...', icon: p.severity === 'critical' ? '🔴' : p.severity === 'warning' ? '🟡' : '🟢', action:() => { closePalette(); switchView('monitor'); } });
   });
+  return items;
+}
+
+const searchIndex = buildSearchIndex();
+let selectedIdx = 0;
+
+function renderResults(query) {
+  const q = query.toLowerCase().trim();
+  const filtered = q ? searchIndex.filter(item => item.label.toLowerCase().includes(q)) : searchIndex.slice(0, 8);
+  selectedIdx = 0;
+  if (filtered.length === 0) {
+    cmdResults.innerHTML = '<div style="padding:16px 20px;color:var(--text-4);font-size:13px;text-align:center;">No results found</div>';
+    return;
+  }
+  cmdResults.innerHTML = filtered.slice(0, 10).map((item, i) =>
+    `<div class="cmd-result${i === 0 ? ' selected' : ''}" data-idx="${i}">
+      <span class="cmd-result-icon">${item.icon}</span>
+      <div class="cmd-result-text">
+        <div class="cmd-result-label">${item.label}</div>
+        <div class="cmd-result-type">${item.type}</div>
+      </div>
+    </div>`
+  ).join('');
+  /* Store filtered for execution */
+  cmdResults._filtered = filtered.slice(0, 10);
+}
+
+function openPalette() {
+  cmdOverlay.classList.add('open');
+  cmdInput.value = '';
+  renderResults('');
+  setTimeout(() => cmdInput.focus(), 50);
+}
+
+function closePalette() {
+  cmdOverlay.classList.remove('open');
+  cmdInput.blur();
+}
+
+cmdInput.addEventListener('input', () => renderResults(cmdInput.value));
+
+cmdInput.addEventListener('keydown', e => {
+  const results = cmdResults.querySelectorAll('.cmd-result');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    results[selectedIdx]?.classList.remove('selected');
+    selectedIdx = Math.min(selectedIdx + 1, results.length - 1);
+    results[selectedIdx]?.classList.add('selected');
+    results[selectedIdx]?.scrollIntoView({ block:'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    results[selectedIdx]?.classList.remove('selected');
+    selectedIdx = Math.max(selectedIdx - 1, 0);
+    results[selectedIdx]?.classList.add('selected');
+    results[selectedIdx]?.scrollIntoView({ block:'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const filtered = cmdResults._filtered;
+    if (filtered && filtered[selectedIdx]) filtered[selectedIdx].action();
+  } else if (e.key === 'Escape') {
+    closePalette();
+  }
+});
+
+cmdOverlay.addEventListener('click', e => {
+  if (e.target === cmdOverlay) closePalette();
 });
 
 /* ⌘K shortcut */
 document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
     e.preventDefault();
-    document.getElementById('globalInput').focus();
+    if (cmdOverlay.classList.contains('open')) closePalette();
+    else openPalette();
+  }
+  if (e.key === 'Escape' && cmdOverlay.classList.contains('open')) {
+    closePalette();
   }
 });
 
@@ -1692,12 +1939,13 @@ document.addEventListener('keydown', e => {
    CLOCK
    ═══════════════════════════════════════════ */
 function updateClock() {
+  const tz = 'Asia/Jakarta';
   const now = new Date();
-  const opts = { month:'short', day:'numeric', year:'numeric' };
-  const time = now.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
-  document.getElementById('headerTime').textContent = now.toLocaleDateString('en-US', opts) + ' · ' + time;
+  const dateStr = now.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', timeZone:tz });
+  const timeStr = now.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', timeZone:tz });
+  document.getElementById('headerTime').textContent = dateStr + ' · ' + timeStr + ' WIB';
 }
-setInterval(updateClock, 30000);
+setInterval(updateClock, 60000);
 
 /* ═══════════════════════════════════════════
    INIT
@@ -1714,6 +1962,7 @@ renderNewsList();
 renderTrackersDetail();
 renderResearch();
 renderWatchlist();
+renderChipSets();
 updateClock();
 
 // Kick off initial view transition + segment bar animation
