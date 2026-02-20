@@ -221,7 +221,7 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
   background:radial-gradient(circle,rgba(255,45,120,0.08) 0%,transparent 70%);
   pointer-events:none;
 }
-.hero-inner{display:grid;grid-template-columns:260px 1fr;gap:20px;}
+.hero-inner{display:grid;grid-template-columns:300px 1fr;gap:20px;}
 .hero-left{position:relative;z-index:1;}
 .hero-label{
   font-family:var(--font-mono);font-size:10px;text-transform:uppercase;
@@ -332,6 +332,7 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
 .pulse-source-tag.trends{border-color:rgba(251,191,36,0.2);color:var(--amber);}
 .pulse-source-tag.regulatory{border-color:rgba(255,45,120,0.15);color:var(--thermal);}
 .pulse-source-tag.appintel{border-color:rgba(96,165,250,0.15);color:var(--blue);}
+.pulse-source-tag.research{border-color:rgba(14,243,197,0.2);color:var(--aurora);}
 .pulse-time{font-family:var(--font-mono);font-size:9px;color:var(--text-5);white-space:nowrap;flex-shrink:0;}
 .pulse-arrow{font-family:var(--font-mono);font-size:10px;color:var(--aurora);opacity:0;transition:opacity 120ms;flex-shrink:0;}
 .pulse-item:hover .pulse-arrow{opacity:1;}
@@ -866,7 +867,7 @@ body::after{width:500px;height:500px;background:var(--aurora);bottom:-200px;righ
             <div class="hero-label">Consumer NPS <span class="critical-tag">Critical</span></div>
             <div class="hero-value">31</div>
             <div class="hero-delta">↓ 3 pts vs last month · lowest since Mar 2025</div>
-            <div class="hero-sparkline"><canvas id="heroSparkline" width="240" height="56"></canvas></div>
+            <div class="hero-sparkline"><canvas id="heroSparkline" width="280" height="80"></canvas></div>
           </div>
           <div class="hero-right">
             <div class="hero-seg">
@@ -1143,25 +1144,25 @@ const DATA = {
       comp:'Gojek: 62', source:'Reviews' },
   ],
   pulse: [
-    { severity:'critical', text:'<strong>Commission cap discussion surging on Twitter</strong> — mentions up 340% in 48h, linked to OJK regulatory filing. Driver forums amplifying discontent.', sources:['Social','News','Trends'], time:'2h ago' },
-    { severity:'critical', text:'<strong>OJK regulatory filing references ride-hailing commission structures</strong> — potential Q2 review. Legal team flagged for review.', sources:['News','Regulatory'], time:'6h ago' },
-    { severity:'warning', text:'<strong>Gojek promo pricing detected in Surabaya</strong> — 40% discount on GoCar rides across 3 cities. Driver complaints about undercutting rising.', sources:['Social','Trends'], time:'5h ago' },
-    { severity:'warning', text:'<strong>ShopeeFood expanding dark kitchen network</strong> — 15 new locations detected in Jabodetabek via app intelligence data.', sources:['News','App Intel'], time:'1d ago' },
-    { severity:'watch', text:'<strong>App Store rating improved to 4.3</strong> — latest update resolved payment bug. Positive review velocity +28% vs pre-patch average.', sources:['Reviews'], time:'8h ago' },
+    { severity:'critical', text:'<strong>Commission cap discussion surging</strong> — Twitter/Kaskus mentions up 340% in 48h. Driver forums show coordinated protest planning.', sources:['Social','News'], time:'2h ago' },
+    { severity:'critical', text:'<strong>NPS dropped 3 points to 31</strong> — lowest since March 2025. Correlation with driver satisfaction at 0.87.', sources:['Research','Social','Reviews'], time:'6h ago' },
+    { severity:'warning', text:'<strong>Gojek launched 40% GoCar discounts in Surabaya and Bandung</strong> — Share of Voice dropped from 51% to 39%.', sources:['Social','Trends'], time:'4h ago' },
+    { severity:'warning', text:'<strong>OJK published draft commission structure framework</strong> — public comment period opens March 1.', sources:['News'], time:'8h ago' },
+    { severity:'watch', text:'<strong>ShopeeFood expanding dark kitchen network</strong> — 15 new locations detected in Jabodetabek.', sources:['News','Social'], time:'12h ago' },
   ],
   miniWatchlist: [
-    { name:'Commission Regulation', severity:'high', stat:'340%', statLabel:'mention spike', delta:'↑ 280%', deltaDir:'up-bad' },
-    { name:'Driver Attrition', severity:'high', stat:'44%', statLabel:'pulse score', delta:'↓ 6 pts', deltaDir:'down-bad' },
+    { name:'Commission Cap Regulation', severity:'high', stat:'340%', statLabel:'mention spike', delta:'↑ 280%', deltaDir:'up-bad' },
+    { name:'Driver Attrition Signal', severity:'high', stat:'44%', statLabel:'pulse score', delta:'↓ 6 pts', deltaDir:'down-bad' },
     { name:'Gojek Pricing', severity:'med', stat:'3 cities', statLabel:'active promos', delta:'+1 city', deltaDir:'up-bad' },
     { name:'Gen Z Sentiment', severity:'low', stat:'+18%', statLabel:'TikTok positive', delta:'↑ 4 pts', deltaDir:'up-good' },
   ],
   engine: [
-    { type:'aurora', text:'Brand24 social ingestion complete — 4,230 mentions processed', time:'2m ago' },
-    { type:'aurora', text:'AppFollow review sync — 128 new reviews (4.3★ avg)', time:'14m ago' },
-    { type:'blue', text:'NPS tracker recalculated — 31 (↓3)', time:'28m ago' },
-    { type:'amber', text:'Watchlist trigger: Commission mention spike > 200% threshold', time:'1h ago' },
-    { type:'violet', text:'SerpAPI trend scan complete — 3 new trending topics', time:'2h ago' },
-    { type:'aurora', text:'Event Registry news scan — 47 articles indexed', time:'3h ago' },
+    { type:'aurora', text:'Gen pop survey Wave 3 ingested — 2,400 responses', time:'2h ago' },
+    { type:'amber', text:'Social spike: Grab commission — 847 mentions/24h', time:'6h ago' },
+    { type:'blue', text:'AppFollow review sync — 128 new reviews (4.3★ avg)', time:'8h ago' },
+    { type:'violet', text:'SerpAPI trend scan complete — 3 new trending topics', time:'12h ago' },
+    { type:'aurora', text:'Event Registry news scan — 47 articles indexed', time:'14h ago' },
+    { type:'amber', text:'Watchlist trigger: Commission spike > 200% threshold', time:'1d ago' },
   ],
   socialStats: [
     { label:'Share of Voice', val:'47%', sub:'↓ 2.1 vs last month' },
@@ -1344,8 +1345,7 @@ function renderHeroSparkline() {
   const canvas = document.getElementById('heroSparkline');
   const data = [38,36,35,37,34,33,36,35,33,34,34,31];
   const color = '#FF2D78';
-  const fillAlpha = 0.12;
-  const cw = 240, ch = 56;
+  const cw = 280, ch = 80;
   const dpr = window.devicePixelRatio || 1;
   canvas.width = cw * dpr;
   canvas.height = ch * dpr;
@@ -1357,34 +1357,36 @@ function renderHeroSparkline() {
   const min = Math.min(...data) - 2;
   const max = Math.max(...data) + 2;
   const step = cw / (data.length - 1);
-  const getY = v => ch - ((v - min) / (max - min)) * ch;
+  const getY = v => ch - ((v - min) / (max - min)) * (ch - 8) - 4;
 
-  const duration = 1500; // ms
+  const duration = 1500;
   let start = null;
   function animate(ts) {
     if (!start) start = ts;
     const elapsed = ts - start;
     const progress = Math.min(elapsed / duration, 1);
-    // easeOutCubic
     const ease = 1 - Math.pow(1 - progress, 3);
     const drawLen = ease * cw;
 
     ctx.clearRect(0, 0, cw, ch);
 
-    // Clipping region for the reveal
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, 0, drawLen, ch);
     ctx.clip();
 
-    // fill
+    // gradient fill beneath the line
     ctx.beginPath();
     ctx.moveTo(0, getY(data[0]));
     data.forEach((v, i) => ctx.lineTo(i * step, getY(v)));
     ctx.lineTo(cw, ch);
     ctx.lineTo(0, ch);
     ctx.closePath();
-    ctx.fillStyle = color + (Math.round(fillAlpha * 255)).toString(16).padStart(2, '0');
+    const grad = ctx.createLinearGradient(0, 0, 0, ch);
+    grad.addColorStop(0, 'rgba(255,45,120,0.28)');
+    grad.addColorStop(0.6, 'rgba(255,45,120,0.08)');
+    grad.addColorStop(1, 'rgba(255,45,120,0.0)');
+    ctx.fillStyle = grad;
     ctx.fill();
 
     // line
@@ -1392,21 +1394,23 @@ function renderHeroSparkline() {
     ctx.moveTo(0, getY(data[0]));
     data.forEach((v, i) => ctx.lineTo(i * step, getY(v)));
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
     ctx.stroke();
 
     ctx.restore();
 
-    // end dot (only when fully drawn)
+    // end dot + glow when fully drawn
     if (progress >= 1) {
       const last = data.length - 1;
       ctx.beginPath();
-      ctx.arc(last * step, getY(data[last]), 4, 0, Math.PI * 2);
-      ctx.fillStyle = color;
+      ctx.arc(last * step, getY(data[last]), 10, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,45,120,0.15)';
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(last * step, getY(data[last]), 8, 0, Math.PI * 2);
-      ctx.fillStyle = color + '22';
+      ctx.arc(last * step, getY(data[last]), 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = color;
       ctx.fill();
     }
 
